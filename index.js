@@ -1,20 +1,22 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 
 const posts = [
   {
-    userId: 10,
-    name: 99,
-    title: 'temporibus sit alias delectus eligendi possimus magni',
-  },
-  {
-    userId: 1,
-    id: 98,
-    title: 'temporibus sit alias delectus eligendi possimus magni',
-  },
+    id: 1,
+    image: 'https://images.pexels.com/photos/2821728/pexels-photo-2821728.jpeg',
+    createdAt: new Date("08.08.2021"),
+    title: "Dream destinations to visit this year in Paris",
+    description: "Progressively incentivize cooperative systems through technically sound functionalities.Credibly productivate seamless data with flexible schemas.",
+    tag: 'ADVENTURE'
+  }
 ];
 
 // APP үүсгэх
 const app = express();
+
+// Body parser тохиргоо
+app.use(bodyParser.json())
 
 // '/' -> localhost:8000/
 app.get('/', (req, res) => {
@@ -29,6 +31,12 @@ app.get('/posts', (req, res) => {
 
 // Create(POST), - үүсгэх
 app.post('/posts', (req, res) => {
+  // const { title }  = req.body
+  posts.push({
+    id: posts.length + 1,
+    createdAt: new Date(),
+    ...req.body
+  });
   res.send('Create')
 })
 
