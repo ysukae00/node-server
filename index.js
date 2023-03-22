@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors'
 
 const posts = [
   {
@@ -14,6 +15,8 @@ const posts = [
 
 // APP үүсгэх
 const app = express();
+
+app.use(cors('*'))
 
 // Body parser тохиргоо
 app.use(bodyParser.json())
@@ -31,22 +34,40 @@ app.get('/posts', (req, res) => {
 
 // Create(POST), - үүсгэх
 app.post('/posts', (req, res) => {
-  // const { title }  = req.body
   posts.push({
     id: posts.length + 1,
     createdAt: new Date(),
     ...req.body
   });
-  res.send('Create')
+
+  res.status(201).send("Create")
+})
+
+app.get("/posts/:id", (req, res) => {
+  const postId = req.params.id;
+  // posts = [ {id: 1, ... }, { id: 2, ... } ]
+  const post = posts.find(p => p.id === Number(postId));
+  if (!post) {
+    return res.status(204).json({
+      data: "Content not found"
+    })
+  }
+  res.status(200).json(post);
 })
 
 // Delete(DEL) - устгах
-app.del('/posts', (req, res) => {
+app.delete('/posts/:id', (req, res) => {
+  const deleteId = req.params.id;
+  console.log("Delete element id", deleteId);
+  const deleteItemIndex = posts.findIndex(post => post.id === Number(deleteId));
+  // [2, 3, 4]
+  posts.splice(deleteItemIndex, 1);
+  console.log(deleteItemIndex)
   res.send('Delete')
 })
 
 // Update(PUT)  - шинэчлэх
-app.put('/posts', (req, res) => {
+app.put('/posts/:id', (req, res) => {
   res.send('Update')
 })
 
