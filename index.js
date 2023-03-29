@@ -1,6 +1,22 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors'
+import mongoose from 'mongoose';
+import User from './models/User.js';
+//  Db- руу хандах url
+const MONGODB_USERNAME = '';
+const MONGODB_PASSWORD = ''
+const mongoDB_URL = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.km7by.mongodb.net/news`
+
+// MongoDB -  тай холбогдох хэсэг
+async function connectDB() {
+  await mongoose.connect(mongoDB_URL)
+    .then(() => console.log("DB connected"))
+    .catch((err) => console.log("Error", err))
+}
+
+// DB холбох
+connectDB();
 
 const posts = [
   {
@@ -27,6 +43,7 @@ app.get('/', (req, res) => {
 });
 
 // CRUD -
+
 // Read(GET),  - унших
 app.get('/posts', (req, res) => {
   res.json(posts);
@@ -72,6 +89,37 @@ app.put('/posts/:id', (req, res) => {
 })
 
 // GET /name ->
+
+// POST /users {req.body} -> username, lastname
+
+// Step 1
+app.post('/users', async (req, res) => {
+  // Step 2 body - oor orj irsen utga
+  const { username, lastname } = req.body;
+  // console.log("Users", username, lastname)
+  // Step 3 User table - ruu utga nemeh
+  const user = await User.create({
+    username,
+    lastname
+  });
+
+  res.status(201).json({
+    success: true,
+    data: user
+  })
+})
+
+// get all 
+app.get("/users", async (req, res) => {
+  const users = await User.find();
+  res.status(200).json({
+    success: true,
+    data: users
+  })
+})
+
+// get by id 
+// GET '/users/:id' 
 
 // listen -> app port дээр асааах
 app.listen(8000, () => {
