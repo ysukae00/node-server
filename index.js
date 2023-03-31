@@ -6,7 +6,9 @@ import User from './models/User.js';
 //  Db- руу хандах url
 const MONGODB_USERNAME = '';
 const MONGODB_PASSWORD = ''
-const mongoDB_URL = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.km7by.mongodb.net/news`
+const MONGODB_NAME = 'news';
+const MONGODB_HASH = ''
+const mongoDB_URL = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.${MONGODB_HASH}.mongodb.net/${MONGODB_NAME}`
 
 // MongoDB -  тай холбогдох хэсэг
 async function connectDB() {
@@ -91,11 +93,25 @@ app.put('/posts/:id', (req, res) => {
 // GET /name ->
 
 // POST /users {req.body} -> username, lastname
-
+function check(req, res, next) {
+  const { username, lastname } = req.body;
+  if (!username || !lastname) {
+    return res.status(404).json({
+      error: 'Хэрэглэгчийн нэр эсвэл овог хоосон байна'
+    })
+  }
+  next();
+}
 // Step 1
-app.post('/users', async (req, res) => {
+app.post('/users', check, async (req, res) => {
   // Step 2 body - oor orj irsen utga
   const { username, lastname } = req.body;
+
+  // if (!username || !lastname) {
+  //   return res.status(404).json({
+  //     error: 'Хэрэглэгчийн нэр эсвэл овог хоосон байна'
+  //   })
+  // }
   // console.log("Users", username, lastname)
   // Step 3 User table - ruu utga nemeh
   const user = await User.create({
@@ -120,6 +136,53 @@ app.get("/users", async (req, res) => {
 
 // get by id 
 // GET '/users/:id' 
+app.get('/users/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id)
+    res.status(200).json(user);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(404).json({
+        error: "Тухайн өгөгдөл олдсонгүэ!!"
+      })
+    }
+    next()
+  }
+})
+
+// DELETE '/users/:id'
+
+app.delete('/users/:id', async (req, res) => {
+  const id = req.params.id;
+  await User.findByIdAndDelete(id);
+
+  res.status(200).json({
+    msg: 'Deleted'
+  })
+});
+
+// PUT '/users/:id' body -> { username:  }
+
+app.put('/users/:id', async (req, res) => {
+  const { lastname, username } = req.body;
+  try {
+    const id = req.params.id;
+    const user = await User.findByIdAndUpdate(id, {
+      lastname,
+      username
+    }, { new: true })
+
+    return res.status(200).json({
+      success: true,
+      data: user
+    })
+  } catch (err) {
+
+  }
+})
+
+
 
 // listen -> app port дээр асааах
 app.listen(8000, () => {

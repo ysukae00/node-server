@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   lastname: {
     type: String
   },
-});
+}, { timestamps: true });
 
 // Model үүсгэх
 const User = mongoose.model('User', userSchema);
