@@ -3,16 +3,16 @@ import bodyParser from 'body-parser';
 import cors from 'cors'
 import mongoose from 'mongoose';
 import User from './models/User.js';
+import * as dotenv from 'dotenv'
+
+dotenv.config();
+
 //  Db- руу хандах url
-const MONGODB_USERNAME = '';
-const MONGODB_PASSWORD = ''
-const MONGODB_NAME = 'news';
-const MONGODB_HASH = ''
-const mongoDB_URL = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.${MONGODB_HASH}.mongodb.net/${MONGODB_NAME}`
+const MONGODB_URL = process.env.MONGO_DB_URL;
 
 // MongoDB -  тай холбогдох хэсэг
 async function connectDB() {
-  await mongoose.connect(mongoDB_URL)
+  await mongoose.connect(MONGODB_URL)
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("Error", err))
 }
