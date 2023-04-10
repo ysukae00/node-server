@@ -105,7 +105,7 @@ function check(req, res, next) {
 // Step 1
 app.post('/users', check, async (req, res) => {
   // Step 2 body - oor orj irsen utga
-  const { username, lastname } = req.body;
+  const { username, lastname, phoneNumber } = req.body;
 
   // if (!username || !lastname) {
   //   return res.status(404).json({
@@ -116,7 +116,8 @@ app.post('/users', check, async (req, res) => {
   // Step 3 User table - ruu utga nemeh
   const user = await User.create({
     username,
-    lastname
+    lastname,
+    phoneNumber,
   });
 
   res.status(201).json({
@@ -165,12 +166,13 @@ app.delete('/users/:id', async (req, res) => {
 // PUT '/users/:id' body -> { username:  }
 
 app.put('/users/:id', async (req, res) => {
-  const { lastname, username } = req.body;
+  const { lastname, username, phoneNumber } = req.body;
   try {
     const id = req.params.id;
     const user = await User.findByIdAndUpdate(id, {
       lastname,
-      username
+      username,
+      phoneNumber
     }, { new: true })
 
     return res.status(200).json({

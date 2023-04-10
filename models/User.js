@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
   lastname: {
     type: String
   },
+  phoneNumber: {
+    type: Number
+  }
 }, { timestamps: true });
 
 // Model үүсгэх
