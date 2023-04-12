@@ -4,6 +4,7 @@ import cors from 'cors'
 import mongoose from 'mongoose';
 import User from './models/User.js';
 import * as dotenv from 'dotenv'
+import Article from './models/Article.js';
 
 dotenv.config();
 
@@ -23,8 +24,8 @@ connectDB();
 const posts = [
   {
     id: 1,
-    image: 'https://images.pexels.com/photos/2821728/pexels-photo-2821728.jpeg',
     createdAt: new Date("08.08.2021"),
+    image: 'https://images.pexels.com/photos/2821728/pexels-photo-2821728.jpeg',
     title: "Dream destinations to visit this year in Paris",
     description: "Progressively incentivize cooperative systems through technically sound functionalities.Credibly productivate seamless data with flexible schemas.",
     tag: 'ADVENTURE'
@@ -47,41 +48,33 @@ app.get('/', (req, res) => {
 // CRUD -
 
 // Read(GET),  - унших
-app.get('/posts', (req, res) => {
-  res.json(posts);
+app.get('/posts', async (req, res) => {
+  const articles = await Article.find();
+  res.json(articles);
 });
 
 // Create(POST), - үүсгэх
-app.post('/posts', (req, res) => {
-  posts.push({
-    id: posts.length + 1,
-    createdAt: new Date(),
-    ...req.body
-  });
+app.post('/posts', async (req, res) => {
+  const { image, title, description, tag } = req.body;
 
-  res.status(201).send("Create")
+  const article = await Article.create({
+    image, title, description, tag
+  })
+
+  res.status(201).json(article)
 })
 
-app.get("/posts/:id", (req, res) => {
+app.get("/posts/:id", async (req, res) => {
   const postId = req.params.id;
   // posts = [ {id: 1, ... }, { id: 2, ... } ]
-  const post = posts.find(p => p.id === Number(postId));
-  if (!post) {
-    return res.status(204).json({
-      data: "Content not found"
-    })
-  }
-  res.status(200).json(post);
+  const article = await Article.findById(postId)
+  res.status(200).json(article);
 })
 
 // Delete(DEL) - устгах
-app.delete('/posts/:id', (req, res) => {
+app.delete('/posts/:id', async (req, res) => {
   const deleteId = req.params.id;
-  console.log("Delete element id", deleteId);
-  const deleteItemIndex = posts.findIndex(post => post.id === Number(deleteId));
-  // [2, 3, 4]
-  posts.splice(deleteItemIndex, 1);
-  console.log(deleteItemIndex)
+  await Article.findByIdAndDelete(deleteId);
   res.send('Delete')
 })
 
