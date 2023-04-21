@@ -79,8 +79,15 @@ app.delete('/posts/:id', async (req, res) => {
 })
 
 // Update(PUT)  - шинэчлэх
-app.put('/posts/:id', (req, res) => {
-  res.send('Update')
+app.put('/posts/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const article = await Article.findByIdAndUpdate(id, req.body, { new: true })
+
+    return res.status(200).json(article)
+  } catch (error) {
+
+  }
 })
 
 // GET /name ->
