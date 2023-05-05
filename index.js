@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import User from './models/User.js';
 import * as dotenv from 'dotenv'
 import Article from './models/Article.js';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -107,7 +108,7 @@ function check(req, res, next) {
 // Step 1
 app.post('/users', check, async (req, res) => {
   // Step 2 body - oor orj irsen utga
-  const { username, lastname, phoneNumber } = req.body;
+  const { username, lastname, phoneNumber, password } = req.body;
 
   // if (!username || !lastname) {
   //   return res.status(404).json({
@@ -120,6 +121,7 @@ app.post('/users', check, async (req, res) => {
     username,
     lastname,
     phoneNumber,
+    password,
   });
 
   res.status(201).json({
@@ -184,6 +186,32 @@ app.put('/users/:id', async (req, res) => {
   } catch (err) {
 
   }
+})
+
+app.post("/auth/login", async (req, res) => {
+  const { username, password } = req.body
+  const user = await User.findOne({ username }).select("+password");
+  // 1. username - tei hereglech bnuuu
+  if (!user) {
+    return res.status(400).json({
+      msg: "Хэрэглэгчийн нэр эсвэл нууц үг буруу"
+    })
+  }
+  // 2. password unen bnuu 
+  if (String(password) !== user.password) {
+    return res.status(400).json({
+      msg: "Хэрэглэгчийн нэр эсвэл нууц үг буруу"
+    })
+  }
+
+
+  return res.status(200).json({
+    token: jwt.sign({
+      id: user.id,
+      username: user.username,
+    }, 'blablaa', { expiresIn: '30d' })
+  })
+  // 3. res -> amjilttai 
 })
 
 

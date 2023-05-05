@@ -10,7 +10,11 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: Number
-  }
+  },
+  password: {
+    type: String,
+    select: false
+  },
 }, { timestamps: true });
 
 // Model үүсгэх
