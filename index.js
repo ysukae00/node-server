@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import User from './models/User.js';
 import * as dotenv from 'dotenv'
 import Article from './models/Article.js';
+import Banner from './models/Banner.js';
 import jwt from 'jsonwebtoken';
 
 dotenv.config();
@@ -212,9 +213,69 @@ app.post("/auth/login", async (req, res) => {
     }, 'blablaa', { expiresIn: '30d' })
   })
   // 3. res -> amjilttai 
+});
+
+app.get("/banners", async (rep, res) => {
+  const banner = await Banner.find();
+  res.status(200).json(banner)
+});
+
+app.get("/banners/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const banner = await Banner.findById(id);
+    res.status(200).json(banner)
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(404).json({
+        error: "Tuhain ogogdol oldsonguie"
+      })
+    }
+    next();
+  }
+});
+
+app.post('/banners', async (req, res) => {
+  // Step 2 body - oor orj irsen utga
+  const { image, description, title } = req.body;
+
+  const banner = await Banner.create({
+    image,
+    description,
+    title
+  })
+  res.status(201).json({
+    success: true,
+    data: banner
+  })
+});
+
+app.delete('/banners/:id', async (req, res) => {
+  const id = req.params.id;
+  await Banner.findByIdAndDelete(id);
+
+  res.status(200).json({
+    msg: 'Deleted'
+  })
+});
+
+app.put('/banners/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const banner = await Banner.findByIdAndUpdate(id, req.body, {
+      title,
+      image,
+      description
+    }, { new: true })
+
+    return res.status(200).json({
+      success: true,
+      data: banner
+    })
+  } catch (error) {
+
+  }
 })
-
-
 
 // listen -> app port дээр асааах
 app.listen(8000, () => {
